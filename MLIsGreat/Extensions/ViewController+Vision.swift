@@ -45,9 +45,9 @@ extension CoreMLViewController {
         })
         
         // Detect only certain rectangles
-        //request.maximumObservations = 0
-        //request.minimumConfidence = 0.5
-        //request.minimumAspectRatio = 0.4
+        request.maximumObservations = 0
+        request.minimumConfidence = 0.5
+        request.minimumAspectRatio = 0.4
         
         return request
     }
@@ -91,7 +91,7 @@ extension CoreMLViewController {
     }
 
     
-    func performVisionRequest(image: UIImage) {
+    func performVisionRequest(image: UIImage, type: RectanglesRequest) {
         guard let cgImage = image.cgImage else {
             return
         }
@@ -99,7 +99,21 @@ extension CoreMLViewController {
         let imageRequestHandler = VNImageRequestHandler(cgImage: cgImage,
                                                         orientation: image.cgOrientation,
                                                         options: [:])
-        let requests = [rectangleDetectionRequest, textDetectionRequest, faceDetectionRequest, barcodesDetectionRequest]
+        
+        var requests = [VNImageBasedRequest]()
+        switch type {
+        case .barcode:
+            requests.append(barcodesDetectionRequest)
+        case .face:
+            requests.append(faceDetectionRequest)
+        case .rectangle:
+            requests.append(rectangleDetectionRequest)
+        case .text:
+            requests.append(textDetectionRequest)
+        case .all:
+            requests = [rectangleDetectionRequest, textDetectionRequest, faceDetectionRequest, barcodesDetectionRequest]
+        }
+        
         // Send the requests to the request handler.
         DispatchQueue.global(qos: .userInitiated).async {
             do {
@@ -162,4 +176,12 @@ extension CoreMLViewController {
             self.imageView.image = drawnImage
         }
     }
+}
+
+enum RectanglesRequest {
+    case text
+    case face
+    case barcode
+    case rectangle
+    case all
 }

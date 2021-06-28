@@ -10,10 +10,15 @@ import UIKit
 class CoreMLViewController: UIViewController {
 
     @IBOutlet weak var imageView: UIImageView!
+    var requestType: RectanglesRequest?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
+    }
+    
+    @IBAction func backClicked() {
+        self.navigationController?.popViewController(animated: true)
     }
     
     // MARK: - Actions
@@ -61,6 +66,7 @@ extension CoreMLViewController: UIImagePickerControllerDelegate, UINavigationCon
         // set the image view's image
         imageView.image = uiImage
         
-        performVisionRequest(image: uiImage)
+        guard let type = requestType else { return }
+        performVisionRequest(image: uiImage, type: type)
     }
 }
